@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
             Log.w("SignIn", "signInResult:failed code=" + e.getStatusCode());
             forceLogout("Silent authentication failed. Please log in.");
         }
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void signIn() {
