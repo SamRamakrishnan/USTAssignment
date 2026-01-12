@@ -1,6 +1,6 @@
 package com.testproject.ustassignment;
 
-
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +31,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         HomeActivity.Device device = deviceList.get(position);
         holder.nameText.setText(device.getName());
         holder.ipText.setText(device.getIp());
+        holder.statusText.setText(device.getStatus());
+        holder.statusText.setTextColor(device.getStatus().equals("Online") ? Color.GREEN : Color.RED);
     }
 
     @Override
@@ -39,12 +41,13 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     }
 
     public static class DeviceViewHolder extends RecyclerView.ViewHolder {
-        TextView nameText, ipText;
+        TextView nameText, ipText, statusText;
 
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
             nameText = itemView.findViewById(R.id.device_name);
             ipText = itemView.findViewById(R.id.device_ip);
+            statusText = itemView.findViewById(R.id.device_status);
         }
     }
 }

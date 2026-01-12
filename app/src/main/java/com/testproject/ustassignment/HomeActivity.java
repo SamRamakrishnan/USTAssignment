@@ -1,10 +1,10 @@
 package com.testproject.ustassignment;
 
 
-
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -25,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
     private List<Device> deviceList = new ArrayList<>();
     private DeviceAdapter adapter;
     private RecyclerView recyclerView;
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +37,12 @@ public class HomeActivity extends AppCompatActivity {
         adapter = new DeviceAdapter(deviceList);
         recyclerView.setAdapter(adapter);
 
+        db = AppDatabase.getDatabase(this);
         nsdManager = (NsdManager) getSystemService(Context.NSD_SERVICE);
         initializeDiscoveryListener();
+
+        // Load devices from DB and mark as offline initially
+        loadDevicesFromDb();
     }
 
     @Override
@@ -52,6 +57,30 @@ public class HomeActivity extends AppCompatActivity {
         stopDiscovery();
     }
 
+    private void loadDevicesFromDb() {
+        new AsyncTask<Void, Void, List<DeviceEntity>>() {
+            @Override
+            protected List<DeviceEntity> doInBackground(Void... voids) {
+                List<DeviceEntity> entities = db.deviceDao().getAllDevices();
+                // Mark all as offline on load
+                for (DeviceEntity entity : entities) {
+                    entity.status = "Offline";
+                    db.deviceDao().update(entity);
+                }
+                return entities;
+            }
+
+            @Override
+            protected void onPostExecute(List<DeviceEntity> entities) {
+                deviceList.clear();
+                for (DeviceEntity entity : entities) {
+                    deviceList.add(new Device(entity.name, entity.ip, entity.status));
+                }
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
+    }
+
     private void initializeDiscoveryListener() {
         discoveryListener = new NsdManager.DiscoveryListener() {
             @Override
@@ -62,7 +91,6 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onServiceFound(NsdServiceInfo service) {
                 Log.d(TAG, "Service found: " + service.getServiceName());
-                // Resolve the service to get IP
                 nsdManager.resolveService(service, new NsdManager.ResolveListener() {
                     @Override
                     public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
@@ -75,11 +103,34 @@ public class HomeActivity extends AppCompatActivity {
                         if (host != null) {
                             String ip = host.getHostAddress();
                             String name = serviceInfo.getServiceName();
-                            Device device = new Device(name, ip);
+                            Device device = new Device(name, ip, "Online");
                             if (!deviceList.contains(device)) {
                                 deviceList.add(device);
-                                runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                // Save to DB
+                                new AsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        db.deviceDao().insert(new DeviceEntity(name, ip, "Online"));
+                                        return null;
+                                    }
+                                }.execute();
+                            } else {
+                                // Update status to online
+                                for (Device d : deviceList) {
+                                    if (d.getIp().equals(ip)) {
+                                        d.setStatus("Online");
+                                        new AsyncTask<Void, Void, Void>() {
+                                            @Override
+                                            protected Void doInBackground(Void... voids) {
+                                                db.deviceDao().updateStatus(ip, "Online");
+                                                return null;
+                                            }
+                                        }.execute();
+                                        break;
+                                    }
+                                }
                             }
+                            runOnUiThread(() -> adapter.notifyDataSetChanged());
                         }
                     }
                 });
@@ -88,7 +139,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onServiceLost(NsdServiceInfo service) {
                 Log.d(TAG, "Service lost: " + service.getServiceName());
-                // Optionally remove from list
+                // Optionally update status to offline
             }
 
             @Override
@@ -119,18 +170,21 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    // Inner class for device data
     public static class Device {
         private String name;
         private String ip;
+        private String status;
 
-        public Device(String name, String ip) {
+        public Device(String name, String ip, String status) {
             this.name = name;
             this.ip = ip;
+            this.status = status;
         }
 
         public String getName() { return name; }
         public String getIp() { return ip; }
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
 
         @Override
         public boolean equals(Object obj) {
