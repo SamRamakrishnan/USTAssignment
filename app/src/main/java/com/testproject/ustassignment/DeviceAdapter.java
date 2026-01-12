@@ -1,5 +1,6 @@
 package com.testproject.ustassignment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,15 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         holder.ipText.setText(device.getIp());
         holder.statusText.setText(device.getStatus());
         holder.statusText.setTextColor(device.getStatus().equals("Online") ? Color.GREEN : Color.RED);
+
+        // Add click listener to navigate to detail screen
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DetailActivity.class);
+            intent.putExtra("device_name", device.getName());
+            intent.putExtra("device_ip", device.getIp());
+            intent.putExtra("device_status", device.getStatus());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

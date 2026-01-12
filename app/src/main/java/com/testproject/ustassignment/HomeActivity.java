@@ -2,11 +2,14 @@ package com.testproject.ustassignment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +30,8 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private AppDatabase db;
 
+    private TextView tv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +39,15 @@ public class HomeActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.devices_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tv = findViewById(R.id.title_text);
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+
+                startActivity(intent);
+            }
+        });
         adapter = new DeviceAdapter(deviceList);
         recyclerView.setAdapter(adapter);
 
