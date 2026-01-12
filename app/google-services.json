@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "854140022628",
+    "project_id": "ustassignment-701e3",
+    "storage_bucket": "ustassignment-701e3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854140022628:android:a146255502ec8bb2fb5471",
+        "android_client_info": {
+          "package_name": "com.testproject.ustassignment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854140022628-165edof06l3hfp3iek068aoa55j2l0f8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.testproject.ustassignment",
+            "certificate_hash": "c5554400e3530ac19c3f7d12a2bada7e5bc27e7b"
+          }
+        },
+        {
+          "client_id": "854140022628-ps8p0c02q4eb2g0vnid63q568iodgh20.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt_RsC6TvjykZsAVG7Rcqh07_WXfejZ6I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854140022628-ps8p0c02q4eb2g0vnid63q568iodgh20.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
