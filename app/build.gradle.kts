@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.testproject.ustassignment"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.testproject.ustassignment"
